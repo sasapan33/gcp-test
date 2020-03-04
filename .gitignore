@@ -1,0 +1,9 @@
+# 系統設定檔
+.DS_Store
+*.json
+*.pem
+
+# To ignore any directories named DirectoryA 
+**/venv/
+**/mm/
+
