@@ -1,7 +1,7 @@
 ## 連線到cloudsql tips
 連線方式詳見cloudsql.js
 
-db連線參數寫在`.env`中，此處就不commit上來
+db連線參數寫在`.env`中，此處就不commit上來
 
 不過格式大概如下
 
