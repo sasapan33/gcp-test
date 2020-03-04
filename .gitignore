@@ -1,9 +1,13 @@
 # 系統設定檔
-.DS_Store
-*.json
+**/.DS_Store
+sasa*.json
 *.pem
+**/.env
 
 # To ignore any directories named DirectoryA 
 **/venv/
 **/mm/
+**/node_modules/
+**/.vscode/
+
 
