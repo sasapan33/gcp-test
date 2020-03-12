@@ -3,11 +3,13 @@
 sasa*.json
 *.pem
 **/.env
+**/sasa*.json
 
 # To ignore any directories named DirectoryA 
 **/venv/
 **/mm/
 **/node_modules/
 **/.vscode/
-
+**/myenv/
+**/__pycache__/
 
