@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import base64
 
 def hello(request):
     print('hello=', request)
@@ -35,14 +36,10 @@ def triggerByBucket(data, context):
     Returns:
         None; the output is written to Stackdriver Logging
     """
-    print('data=', data['bucket'], '===', data['name'])
+    print('triggerByBucket=', data['bucket'], '===', data['name'])
     print('Event ID: {}'.format(context.event_id))
     print('Event type: {}'.format(context.event_type))
     print('Bucket: {}'.format(data['bucket']))
-    print('File: {}'.format(data['name']))
-    print('Metageneration: {}'.format(data['metageneration']))
-    print('Created: {}'.format(data['timeCreated']))
-    print('Updated: {}'.format(data['updated']))
     #toslack
     dict_headers = {'Content-type': 'application/json'}
     dict_payload = {
@@ -51,5 +48,49 @@ def triggerByBucket(data, context):
     url = os.environ['SLACKTOME']
     rtn = requests.post(url, data=json_payload, headers=dict_headers)
     print(rtn.text)
+
+def triggerByPubsub(event, context):
+    """Background Cloud Function to be triggered by Pub/Sub.
+    Args:
+         event (dict):  The dictionary with data specific to this type of
+         event. The `data` field contains the PubsubMessage message. The
+         `attributes` field will contain custom attributes if there are any.
+         context (google.cloud.functions.Context): The Cloud Functions event
+         metadata. The `event_id` field contains the Pub/Sub message ID. The
+         `timestamp` field contains the publish time.
+    """
+    
+
+    def getToken():
+        func_url = os.environ['SLACKTOME']
+        metadata_url = 'http://metadata/computeMetadata/v1/instance/service-accounts/default/identity?audience='
+
+        token_url = metadata_url + func_url
+        token_header = {'Metadata-Flavor': 'Google'}
+
+        token_response = requests.get(token_url, headers=token_header)
+        jwt = token_response.content.decode('utf-8')
+        print('jwt===',jwt)
+        return jwt
+        
+
+    print("triggerByPubsub {} published at {}".format(context.event_id, context.timestamp))
+
+    if 'data' in event:
+        jwt = getToken()
+
+        name = base64.b64decode(event['data']).decode('utf-8')
+        #toslack
+        dict_headers = {'Content-type': 'application/json', 'Authorization': f'bearer {jwt}'}
+        dict_payload = {
+            "text": 'pubsub來了一個訊息='+name
+        }
+        json_payload = json.dumps(dict_payload)
+        url = os.environ['SLACKTOME']
+        rtn = requests.post(url, data=json_payload, headers=dict_headers)
+        print(rtn.text)
+    else:
+        name = 'no data'
+    print('Hello {}!'.format(name))
 
 # slackToMe() os.environ['SLACK_WEBHOOK']
