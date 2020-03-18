@@ -5,6 +5,7 @@
 - list/create instance
 - list all bucket
 - insert/list cloudsql 某一個table的東西
+- cloud function相關
 
 需設定環境變數讓gcp認識你是誰
 
