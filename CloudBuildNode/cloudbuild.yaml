@@ -1,0 +1,34 @@
+steps:
+- name: node #npm install
+  entrypoint: npm
+  args: ['install']
+  dir: 'node/MyExpress' 
+  id: 'npm-install'
+- name: node #npm build
+  entrypoint: npm
+  args: ['run', 'build']
+  dir: 'node/MyExpress'
+  id: 'npm-build'
+- name: gcr.io/cloud-builders/docker #docker build
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/cloudbuildtest:$SHORT_SHA', '--no-cache=true', '.']
+  dir: 'node/MyExpress'
+  id: 'docker-build'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/cloudbuildtest:$SHORT_SHA']
+  id: 'docker-push'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: 
+  - 'set'
+  - 'image'
+  - 'deployment'
+  - 'hello-cloud-build-1'
+  - 'hello-cloud-build=gcr.io/$PROJECT_ID/cloudbuildtest:$SHORT_SHA'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=YOUR_ZONE'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=YOUR_CLUSTER_NAME'
+  waitFor: ['docker-push', 'docker-build', 'npm-install', 'npm-build'] #等這四件事都做完後才做這個step
+  
+logsBucket: 'gs://YOUR_BUCKETNAME/log' #log輸出
+
+#images: ['gcr.io/$PROJECT_ID/cloudbuildtest:$SHORT_SHA'] #docker push
+# timeout: 600

@@ -1,0 +1,22 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: hello-cloud-build
+  name: hello-cloud-build-1
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        run: hello-cloud-build
+    spec:
+      containers:
+      - image: gcr.io/YOUR_PROJECT_ID/cloudbuildtest:v2
+        name: hello-cloud-build
+        imagePullPolicy: Always
