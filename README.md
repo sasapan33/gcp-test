@@ -1,7 +1,7 @@
 # gcp-test
 
 ## python
-目前sample有：yyy111
+目前sample有：yyy111222
 - list/create instance
 - list all bucket
 - insert/list cloudsql 某一個table的東西
